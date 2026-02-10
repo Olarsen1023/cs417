@@ -33,6 +33,7 @@ def validate(json_string):
     """
     stack = stack()
     line = 1, col = 0
+    in_string = False
 
     i = 0
     n = len(json_string)
@@ -54,31 +55,54 @@ def validate(json_string):
                 col = 0
             continue
         
-        if ch == '{' or ch == '[':
-            stack.push((ch, line, col))
-        elif ch == '}' or ch == ']':
-            if stack.is_empty():
-                #unexpected close bracket thingy
-                return (False, f"ERROR Line {line}, Col {col}: Unexpected closer '{ch}'")
-            
-            open_char, open_line, open_col = stack.pop()
-            if open_char == '{' and ch != '}':
-                # squig mismatch
-                return (False, f"ERROR Line {line}, Col {col}: Expected '}}' but got {ch}'", f"(opening '{{' at Line {open_line}, Col {open_col})")
-           
-            if open_char == '[' and ch != ']':
-                # bracket mismatch
-                return (
-                    False,
-                    f"ERROR Line {line}, Col {col}: Expected ']' but found '{ch}' "
-                    f"(opening '[' at Line {open_line}, Col {open_col})"
-                )
-        # had to add this to keep parsing
-        i += 1
+        # in string handling
+        if in_string:
+            if ch == '\\':
+                # skip the next character since it's escaped
+                i += 1
+                if i < n:
+                    col += 1  # count the escaped character in the column
+                i += 1
+                continue
+            elif ch == '"':
+                in_string = False
+                i += 1
+                continue
+            else:
+                i += 1
+                continue
+        else:
+            if ch == '"':
+                in_string = True
+                i += 1
+                continue
+            elif ch == '{' or ch == '[':
+                stack.push((ch, line, col))
+            elif ch == '}' or ch == ']':
+                if stack.is_empty():
+                    return (False, f"ERROR Line {line}, Col {col}: Unexpected closer '{ch}'")
+                open_char, open_line, open_col = stack.pop()
+                if open_char == '{' and ch != '}':
+                    return (
+                        False,
+                        f"ERROR Line {line}, Col {col}: Expected '}}' but found '{ch}' "
+                        f"(opening '{{' at Line {open_line}, Col {open_col})"
+                    )
+                if open_char == '[' and ch != ']':
+                    return (
+                        False,
+                        f"ERROR Line {line}, Col {col}: Expected ']' but found '{ch}' "
+                        f"(opening '[' at Line {open_line}, Col {open_col})"
+                    )
 
-    # checks the end of the string
+            i += 1
+
+    # check for unclosed string at the end of the file
+    if in_string:
+        # We reached EOF while inside a string
+        return (False, f"ERROR Line {line}, Col {col}: Unterminated string")
+
     if not stack.is_empty():
-        # find the most recent open to handle that case too
         open_char, open_line, open_col = stack.pop()
         return (False, f"ERROR: Unclosed '{open_char}' at Line {open_line}, Col {open_col}")
 
