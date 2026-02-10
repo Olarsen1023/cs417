@@ -31,8 +31,10 @@ def validate(json_string):
             - errors (list[str]): List of error message strings.
               Empty if valid.
     """
-    stack = stack()
-    line = 1, col = 0
+
+    
+    stack: List[tuple] = []   
+    line, col = 1, 0
     in_string = False
 
     i = 0
@@ -41,8 +43,8 @@ def validate(json_string):
     while i < n:
         ch = json_string[i]
         col += 1
-    
-    # handling the new lines
+
+        # Newline handling
         if ch == '\n':
             line += 1
             col = 0
@@ -54,14 +56,13 @@ def validate(json_string):
                 line += 1
                 col = 0
             continue
-        
-        # in string handling
+
+        # string handling
         if in_string:
             if ch == '\\':
-                # skip the next character since it's escaped
                 i += 1
                 if i < n:
-                    col += 1  # count the escaped character in the column
+                    col += 1
                 i += 1
                 continue
             elif ch == '"':
@@ -77,37 +78,37 @@ def validate(json_string):
                 i += 1
                 continue
             elif ch == '{' or ch == '[':
-                stack.push((ch, line, col))
+                stack.append((ch, line, col))
+                i += 1
+                continue
             elif ch == '}' or ch == ']':
-                if stack.is_empty():
-                    return (False, f"ERROR Line {line}, Col {col}: Unexpected closer '{ch}'")
+                if not stack:
+                    return (False, [f"ERROR Line {line}, Col {col}: Unexpected closer '{ch}'"])
                 open_char, open_line, open_col = stack.pop()
-                if open_char == '{' and ch != '}':
-                    return (
-                        False,
-                        f"ERROR Line {line}, Col {col}: Expected '}}' but found '{ch}' "
-                        f"(opening '{{' at Line {open_line}, Col {open_col})"
-                    )
-                if open_char == '[' and ch != ']':
-                    return (
-                        False,
-                        f"ERROR Line {line}, Col {col}: Expected ']' but found '{ch}' "
-                        f"(opening '[' at Line {open_line}, Col {open_col})"
-                    )
+                if (open_char == '{' and ch != '}') or (open_char == '[' and ch != ']'):
+                    expected = '}' if open_char == '{' else ']'
+                    return (False, [
+                        f"ERROR Line {line}, Col {col}: Expected '{expected}' but found '{ch}' "
+                        f"(opening '{open_char}' at Line {open_line}, Col {open_col})"
+                    ])
+                i += 1
+                continue
+            else:
+                i += 1
+                continue
 
-            i += 1
-
-    # check for unclosed string at the end of the file
+    # end of input checks
     if in_string:
-        # We reached EOF while inside a string
-        return (False, f"ERROR Line {line}, Col {col}: Unterminated string")
+        return (False, [f"ERROR Line {line}, Col {col}: Unterminated string"])
 
-    if not stack.is_empty():
-        open_char, open_line, open_col = stack.pop()
-        return (False, f"ERROR: Unclosed '{open_char}' at Line {open_line}, Col {open_col}")
+    if stack:
+        errors: List[str] = []
+        while stack:
+            open_char, open_line, open_col = stack.pop()
+            errors.append(f"ERROR: Unclosed '{open_char}' at Line {open_line}, Col {open_col}")
+        return (False, errors)
 
-    return (True, None)
-
+    return (True, [])
 
 def validate_file(filepath):
     """
