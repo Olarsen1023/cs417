@@ -31,7 +31,58 @@ def validate(json_string):
             - errors (list[str]): List of error message strings.
               Empty if valid.
     """
+    stack = stack()
+    line = 1, col = 0
 
+    i = 0
+    n = len(json_string)
+
+    while i < n:
+        ch = json_string[i]
+        col += 1
+    
+    # handling the new lines
+        if ch == '\n':
+            line += 1
+            col = 0
+            i += 1
+            continue
+        if ch == '\r':
+            i += 1
+            if i >= n or json_string[i] != '\n':
+                line += 1
+                col = 0
+            continue
+        
+        if ch == '{' or ch == '[':
+            stack.push((ch, line, col))
+        elif ch == '}' or ch == ']':
+            if stack.is_empty():
+                #unexpected close bracket thingy
+                return (False, f"ERROR Line {line}, Col {col}: Unexpected closer '{ch}'")
+            
+            open_char, open_line, open_col = stack.pop()
+            if open_char == '{' and ch != '}':
+                # squig mismatch
+                return (False, f"ERROR Line {line}, Col {col}: Expected '}}' but got {ch}'", f"(opening '{{' at Line {open_line}, Col {open_col})")
+           
+            if open_char == '[' and ch != ']':
+                # bracket mismatch
+                return (
+                    False,
+                    f"ERROR Line {line}, Col {col}: Expected ']' but found '{ch}' "
+                    f"(opening '[' at Line {open_line}, Col {open_col})"
+                )
+        # had to add this to keep parsing
+        i += 1
+
+    # checks the end of the string
+    if not stack.is_empty():
+        # find the most recent open to handle that case too
+        open_char, open_line, open_col = stack.pop()
+        return (False, f"ERROR: Unclosed '{open_char}' at Line {open_line}, Col {open_col}")
+
+    return (True, None)
 
 
 def validate_file(filepath):
