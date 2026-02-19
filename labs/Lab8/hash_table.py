@@ -10,7 +10,7 @@ Do NOT change the method signatures or the __init__ method.
 Run tests:
     pytest -v
 """
-
+# test to commit and push
 
 class HashTable:
     """A hash table using separate chaining for collision resolution."""
