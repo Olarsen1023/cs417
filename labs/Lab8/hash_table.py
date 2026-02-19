@@ -10,7 +10,7 @@ Do NOT change the method signatures or the __init__ method.
 Run tests:
     pytest -v
 """
-
+# test to commit and push
 
 class HashTable:
     """A hash table using separate chaining for collision resolution."""
@@ -21,22 +21,8 @@ class HashTable:
         self.table = [[] for _ in range(self.size)]
         self.count = 0
 
-    # ── TODO 1: Hash Function ─────────────────────────────────────
-
     def _hash(self, key):
-        """
-        Return a bucket index for the given key.
-
-        Use Python's built-in hash() function and modulo (%) to map
-        the key to a valid index in range [0, self.size).
-
-        Args:
-            key: The key to hash (any hashable type).
-
-        Returns:
-            int: A bucket index between 0 and self.size - 1.
-        """
-        pass  # TODO: implement this (1 line)
+        return hash(key) % (self.size - 1)
 
     # ── TODO 2: Put ───────────────────────────────────────────────
 
@@ -55,8 +41,13 @@ class HashTable:
             key:   The key to insert.
             value: The value to associate with the key.
         """
-        pass  # TODO: implement this
-
+        bucket_index = self._hash(key)
+        for pair in self.table[bucket_index]:
+            if pair[0] == key:
+                pair[1] = value
+                return
+        self.table[bucket_index].append([key, value])
+        self.count += 1
     # ── TODO 3: Get ───────────────────────────────────────────────
 
     def get(self, key):
@@ -77,7 +68,12 @@ class HashTable:
         Raises:
             KeyError: If the key is not found.
         """
-        pass  # TODO: implement this
+       
+        bucket_index = self._hash(key)
+        for pair in self.table[bucket_index]:
+            if pair[0] == key:
+                return pair[1]
+        raise KeyError(key)
 
     # ── TODO 4: Delete ────────────────────────────────────────────
 
@@ -97,7 +93,13 @@ class HashTable:
         Raises:
             KeyError: If the key is not found.
         """
-        pass  # TODO: implement this
+        bucket_index = self._hash(key)
+        for i, pair in enumerate(self.table[bucket_index]):
+            if pair[0] == key:
+                self.table[bucket_index].pop(i)
+                self.count -= 1
+                return
+        raise KeyError(key)
 
     # ── Provided Methods (do not modify) ──────────────────────────
 
