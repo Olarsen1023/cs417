@@ -43,7 +43,7 @@ class HashTableOpen:
         Returns:
             int: A slot index between 0 and self.size - 1.
         """
-        pass  # TODO: implement this (1 line)
+        return hash(key) % (self.size - 1)
 
     # ── TODO 2: Put ───────────────────────────────────────────────
 
@@ -67,7 +67,22 @@ class HashTableOpen:
             key:   The key to insert.
             value: The value to associate with the key.
         """
-        pass  # TODO: implement this
+        start = self._hash(key)
+        for step in range(self.size):
+            index = (start + step) % self.size
+            slot = self.table[index]
+            if slot is None:
+                self.table[index] = (key, value)
+                self.count += 1
+                return
+            elif slot is _TOMBSTONE:
+                self.table[index] = (key, value)
+                self.count += 1
+                return
+            elif slot[0] == key:
+                self.table[index] = (key, value)
+                return
+        raise Exception("Hash table is full")
 
     # ── TODO 3: Get ───────────────────────────────────────────────
 
@@ -95,7 +110,17 @@ class HashTableOpen:
         Raises:
             KeyError: If the key is not found.
         """
-        pass  # TODO: implement this
+        start = self._hash(key)
+        for step in range(self.size):
+            index = (start + step) % self.size
+            slot = self.table[index]
+            if slot is None:
+                raise KeyError(key)
+            elif slot is _TOMBSTONE:
+                continue
+            elif slot[0] == key:
+                return slot[1]
+        raise KeyError(key)
 
     # ── TODO 4: Delete ────────────────────────────────────────────
 
@@ -119,7 +144,21 @@ class HashTableOpen:
         Raises:
             KeyError: If the key is not found.
         """
-        pass  # TODO: implement this
+        start = self._hash(key)
+        for step in range(self.size):
+            index = (start + step) % self.size
+            slot = self.table[index]
+            if slot is None:
+                raise KeyError(key)
+            elif slot is _TOMBSTONE:
+                continue
+            elif slot[0] == key:
+                self.table[index] = _TOMBSTONE
+                self.count -= 1
+                return
+        raise KeyError(key)
+
+
 
     # ── Provided Methods (do not modify) ──────────────────────────
 
