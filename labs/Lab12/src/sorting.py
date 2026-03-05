@@ -53,7 +53,16 @@ def _gap_insertion_sort(a_list, start, gap):
         start: The starting index of this sublist.
         gap: The distance between sublist elements.
     """
+
     pass  # TODO: implement this
+
+    for i in range(start + gap, len(a_list), gap):
+        current_value = a_list[i]
+        position = i
+        while position >= gap and a_list[position - gap] > current_value:
+            a_list[position] = a_list[position - gap]
+            position -= gap
+        a_list[position] = current_value
 
 
 def shell_sort(a_list):
@@ -118,8 +127,15 @@ def merge_sort(a_list):
     # Initialize: i = 0, j = 0, k = 0
     # Then write the three while loops described above.
 
-    pass  # TODO: replace this with the merge logic
-
+        i = j = k = 0
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                a_list[k] = left[i]
+                i += 1
+            else:
+                a_list[k] = right[j]
+                j += 1
+            k += 1
     return a_list
 
 
@@ -154,8 +170,26 @@ def _partition(a_list, first, last):
     Returns:
         The index where the pivot ended up (the split point).
     """
-    pass  # TODO: implement this
-
+     
+    pivot_value = a_list[first]
+    
+    left_mark = first + 1
+    right_mark = last
+    done = False
+    
+    while not done:
+        while left_mark <= right_mark and a_list[left_mark] <= pivot_value:
+            left_mark += 1
+        while left_mark <= right_mark and a_list[right_mark] >= pivot_value:
+            right_mark -= 1
+        if right_mark < left_mark:
+            done = True
+        else:
+            a_list[left_mark], a_list[right_mark] = a_list[right_mark], a_list[left_mark]
+    
+    a_list[first], a_list[right_mark] = a_list[right_mark], a_list[first]
+    
+    return right_mark
 
 def _quick_sort_helper(a_list, first, last):
     """Recursive quicksort. DO NOT MODIFY."""
