@@ -74,7 +74,7 @@ def analyze(filepath, ignore_case=False, top=None, min_length=1,
     if reverse:
         sorted_words = list(reversed(sorted_words))
     top_words = sorted_words[:top]
-    result_lines = [f"{filepath}: {total_words} words", "", "Top 5 words:"]
+    result_lines = [f"{filepath}: {total_words} words", "", f"Top {top} words:"]
     for word, count in top_words:
         result_lines.append(f"  {word}: {count}")
     return "\n".join(result_lines)
