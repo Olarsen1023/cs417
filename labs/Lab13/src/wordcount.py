@@ -71,8 +71,8 @@ def analyze(filepath, ignore_case=False, top=None, min_length=1,
         sorted_words = sorted(word_counts.items(), key=lambda x: x[0], reverse=reverse)
     else:
         sorted_words = word_counts.most_common()
-    if reverse:
-        sorted_words = list(reversed(sorted_words))
+        if reverse:
+            sorted_words = sorted(sorted_words, key=lambda x: x[1])
     top_words = sorted_words[:top]
     result_lines = [f"{filepath}: {total_words} words", "", f"Top {top} words:"]
     for word, count in top_words:
