@@ -5,7 +5,7 @@ Implement four traversal algorithms for a Binary Search Tree.
 The BST module is provided — don't modify bst.py.
 """
 
-from bst import BST
+from src.bst import BST
 
 
 def build_sample_tree():
@@ -42,6 +42,14 @@ def explore():
       e.g., "Tree has 9 nodes"
     """
     pass  # TODO: implement this
+    tree = build_sample_tree()
+    tree.display()
+    for value in [12, 20, 25]:
+        found = tree.search(value) is not None
+        print(f"Search {value}: {'Found' if found else 'Not found'}")
+    
+    print(f"Tree has {tree.size()} nodes")
+
 
 
 # ── Task 2: Inorder Traversal (Left → Self → Right) ─────────────────
@@ -55,6 +63,12 @@ def inorder(node):
     TODO: implement this
     """
     pass  # TODO: implement this
+    list = []
+    if node is not None:
+        list.extend(inorder(node.left))
+        list.append(node.value)
+        list.extend(inorder(node.right))
+    return list
 
 
 # ── Task 3: Preorder Traversal (Self → Left → Right) ────────────────
@@ -68,6 +82,13 @@ def preorder(node):
     TODO: implement this
     """
     pass  # TODO: implement this
+    list = []
+    if node is not None:
+        list.append(node.value)
+        list.extend(preorder(node.left))
+        list.extend(preorder(node.right))
+    return list
+
 
 
 # ── Task 4: Postorder Traversal (Left → Right → Self) ───────────────
@@ -81,6 +102,12 @@ def postorder(node):
     TODO: implement this
     """
     pass  # TODO: implement this
+    list = []
+    if node is not None:
+        list.extend(postorder(node.left))
+        list.extend(postorder(node.right))
+        list.append(node.value)
+    return list
 
 
 # ── Task 5: Level-Order Traversal (BFS) ─────────────────────────────
@@ -99,6 +126,19 @@ def levelorder(node):
     TODO: implement this
     """
     pass  # TODO: implement this
+    from collections import deque
+    if node is None:
+        return []
+    result = []
+    queue = deque([node])
+    while queue:
+        current = queue.popleft()
+        result.append(current.value)
+        if current.left:
+            queue.append(current.left)
+        if current.right:
+            queue.append(current.right)
+    return result
 
 
 # ── Main ─────────────────────────────────────────────────────────────

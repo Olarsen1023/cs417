@@ -5,8 +5,8 @@ Run: pytest -v
 """
 
 import pytest
-from bst import BST
-from traversals import (
+from src.bst import BST
+from src.traversals import (
     build_sample_tree,
     explore,
     inorder,
