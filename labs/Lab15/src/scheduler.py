@@ -17,7 +17,7 @@ class TaskScheduler:
     def __init__(self):
         """Initialize the scheduler."""
         # TODO: Set up your internal data structures
-        pass
+        
 
     def add_task(self, priority, description):
         """Add a task to the scheduler.

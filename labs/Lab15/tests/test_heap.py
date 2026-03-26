@@ -5,8 +5,8 @@ Run: pytest -v
 """
 
 import pytest
-from heap_basics import push_and_pop, heapify_and_peek, top_k_smallest, sort_by_priority
-from scheduler import TaskScheduler
+from src.heap_basics import push_and_pop, heapify_and_peek, top_k_smallest, sort_by_priority
+from src.scheduler import TaskScheduler
 
 
 # ── Task 1: Heap Basics ─────────────────────────────────────────────
