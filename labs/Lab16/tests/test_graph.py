@@ -5,7 +5,7 @@ Run: pytest -v
 """
 
 import pytest
-from graph import Graph, build_lab_graph, bfs, dfs, find_path
+from src.graph import Graph, build_lab_graph, bfs, dfs, find_path
 
 
 # ── Task 1: Build the Graph ───────────────────────────────────────
