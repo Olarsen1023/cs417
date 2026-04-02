@@ -33,7 +33,6 @@ class DAGNode:
         Args:
             name: Identifier for this task.
         """
-        # TODO: Store name and initialize dependencies
         self.name = name
         self.dependencies = set()
 
@@ -57,7 +56,11 @@ class DAGNode:
         # TODO: Reject self-loops (Task 2)
         # TODO: Reject cycles using has_ancestor (Task 4)
         # TODO: Add the dependency
-        pass
+        if node == self:
+            raise CycleError(f"Cannot add self-dependency: {self.name} depends on itself.")
+        if node.has_ancestor(self):
+            raise CycleError(f"Cannot add dependency: {self.name} depends on {node.name}, which is an ancestor of {self.name}. This would create a cycle.")
+        self.dependencies.add(node)
 
     def has_ancestor(self, target: "DAGNode") -> bool:
         """Check if target is an ancestor of this node.
