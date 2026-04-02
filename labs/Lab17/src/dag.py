@@ -84,7 +84,16 @@ class DAGNode:
             True if target is reachable via dependencies, False otherwise.
         """
         # TODO: Walk the dependency chain looking for target
-        pass
+        visited = set()
+        stack = list(self.dependencies)
+        while stack:
+            current = stack.pop()
+            if current == target:
+                return True
+            if current not in visited:
+                visited.add(current)
+                stack.extend(current.dependencies)
+        return False
 
     def __repr__(self):
         dep_names = sorted(d.name for d in self.dependencies) if hasattr(self, 'dependencies') else []
