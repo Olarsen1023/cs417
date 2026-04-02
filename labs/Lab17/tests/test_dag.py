@@ -6,7 +6,7 @@ topological sort to validate the resulting structure is a true DAG.
 """
 
 import pytest
-from dag import DAGNode, CycleError
+from src.dag import DAGNode, CycleError
 
 
 # ---------- helpers ----------
