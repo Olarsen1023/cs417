@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from filetools import read_csv, read_json, write_csv, write_json, csv_to_json, json_to_csv
+from src.filetools import read_csv, read_json, write_csv, write_json, csv_to_json, json_to_csv
 
 # Resolve the data directory relative to the lab root
 LAB_ROOT = Path(__file__).resolve().parent.parent
