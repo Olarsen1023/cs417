@@ -30,8 +30,9 @@ def read_csv(filepath: str) -> list[dict]:
         >>> rows[0]["name"]
         'Alice'
     """
-    # TODO: Implement this function
-    pass
+    with open(filepath, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        return list(reader)
 
 
 def read_json(filepath: str):
@@ -53,8 +54,8 @@ def read_json(filepath: str):
         >>> data[0]["grade"]
         92
     """
-    # TODO: Implement this function
-    pass
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 def write_csv(filepath: str, data: list[dict], fieldnames: list[str]) -> None:
@@ -74,8 +75,10 @@ def write_csv(filepath: str, data: list[dict], fieldnames: list[str]) -> None:
     Example:
         >>> write_csv("output.csv", [{"name": "Alice", "grade": 92}], ["name", "grade"])
     """
-    # TODO: Implement this function
-    pass
+    with open(filepath, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)    
 
 
 def write_json(filepath: str, data) -> None:
@@ -93,8 +96,8 @@ def write_json(filepath: str, data) -> None:
     Example:
         >>> write_json("output.json", [{"name": "José", "grade": 91}])
     """
-    # TODO: Implement this function
-    pass
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def csv_to_json(
@@ -123,8 +126,13 @@ def csv_to_json(
     Example:
         >>> csv_to_json("roster.csv", "roster.json", type_hints={"grade": int})
     """
-    # TODO: Implement this function
-    pass
+    rows = read_csv(csv_path)
+    if type_hints is not None:
+        for row in rows:
+            for key, typ in type_hints.items():
+                if key in row:
+                    row[key] = typ(row[key])  # convert string to specified type
+    write_json(json_path, rows)
 
 
 def json_to_csv(
@@ -152,5 +160,9 @@ def json_to_csv(
         >>> json_to_csv("roster.json", "roster.csv", ["name", "email", "grade"])
         # "tags" field from JSON is skipped — it can't be a flat CSV column
     """
-    # TODO: Implement this function
-    pass
+    data = read_json(json_path)
+    rows = []
+    for record in data:
+        row = {key: record[key] for key in fieldnames if key in record}
+        rows.append(row)
+    write_csv(csv_path, rows, fieldnames)
