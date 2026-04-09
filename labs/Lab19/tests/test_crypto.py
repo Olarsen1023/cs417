@@ -8,7 +8,7 @@ import time
 from unittest.mock import patch, Mock
 
 import pytest
-from crypto import get_price, get_prices_batch, CoinCache, get_price_cached
+from src.crypto import get_price, get_prices_batch, CoinCache, get_price_cached
 
 
 # ---------------------------------------------------------------------------
@@ -30,7 +30,7 @@ def _mock_response(json_data, status_code=200):
 class TestGetPrice:
     """Fetch a single coin's price from the API."""
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_returns_price_as_float(self, mock_get):
         mock_get.return_value = _mock_response({"bitcoin": {"usd": 65432.10}})
 
@@ -39,7 +39,7 @@ class TestGetPrice:
         assert isinstance(price, float)
         assert price == 65432.10
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_passes_correct_params(self, mock_get):
         mock_get.return_value = _mock_response({"ethereum": {"usd": 3456.78}})
 
@@ -52,7 +52,7 @@ class TestGetPrice:
         assert params["vs_currencies"] == "usd"
         assert params["x_cg_demo_api_key"] == "my-api-key"
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_raises_on_non_200(self, mock_get):
         mock_get.return_value = _mock_response({}, status_code=429)
 
@@ -67,7 +67,7 @@ class TestGetPrice:
 class TestGetPricesBatch:
     """Fetch multiple coins in one API call."""
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_returns_dict_of_prices(self, mock_get):
         mock_get.return_value = _mock_response({
             "bitcoin": {"usd": 65000.0},
@@ -83,7 +83,7 @@ class TestGetPricesBatch:
             "solana": 120.0,
         }
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_makes_single_api_call(self, mock_get):
         mock_get.return_value = _mock_response({
             "bitcoin": {"usd": 65000.0},
@@ -94,7 +94,7 @@ class TestGetPricesBatch:
 
         assert mock_get.call_count == 1
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_joins_ids_with_commas(self, mock_get):
         mock_get.return_value = _mock_response({
             "bitcoin": {"usd": 65000.0},
@@ -109,7 +109,7 @@ class TestGetPricesBatch:
         coins = set(ids_param.split(","))
         assert coins == {"bitcoin", "solana"}
 
-    @patch("crypto.requests.get")
+    @patch("src.crypto.requests.get")
     def test_raises_on_non_200(self, mock_get):
         mock_get.return_value = _mock_response({}, status_code=500)
 
@@ -231,7 +231,7 @@ class TestCacheTTL:
 class TestGetPriceCached:
     """Cache-aside: check cache first, fetch on miss, store result."""
 
-    @patch("crypto.get_price")
+    @patch("src.crypto.get_price")
     def test_cache_miss_calls_api(self, mock_get_price):
         mock_get_price.return_value = 65000.0
         cache = CoinCache()
@@ -241,7 +241,7 @@ class TestGetPriceCached:
         assert price == 65000.0
         mock_get_price.assert_called_once_with("bitcoin", "fake-key")
 
-    @patch("crypto.get_price")
+    @patch("src.crypto.get_price")
     def test_cache_hit_skips_api(self, mock_get_price):
         cache = CoinCache()
         cache.put("bitcoin", 65000.0)
@@ -251,7 +251,7 @@ class TestGetPriceCached:
         assert price == 65000.0
         mock_get_price.assert_not_called()
 
-    @patch("crypto.get_price")
+    @patch("src.crypto.get_price")
     def test_stores_fetched_price_in_cache(self, mock_get_price):
         mock_get_price.return_value = 65000.0
         cache = CoinCache()
@@ -265,7 +265,7 @@ class TestGetPriceCached:
         assert cache.hits == 1
         assert cache.misses == 1
 
-    @patch("crypto.get_price")
+    @patch("src.crypto.get_price")
     def test_refetches_after_expiry(self, mock_get_price):
         mock_get_price.return_value = 65000.0
         cache = CoinCache(ttl_seconds=5)
