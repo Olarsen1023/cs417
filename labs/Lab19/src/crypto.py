@@ -31,7 +31,17 @@ def get_price(coin_id: str, api_key: str) -> float:
     #    with params: ids, vs_currencies, x_cg_demo_api_key
     # 2. Check status code — raise RuntimeError if not 200
     # 3. Parse JSON and return the USD price as a float
-    pass
+    get_price_url = f"{BASE_URL}/simple/price"
+    params = {
+        "ids": coin_id,
+        "vs_currencies": "usd",
+        "x_cg_demo_api_key": api_key,
+    }
+    response = requests.get(get_price_url, params=params)
+    if response.status_code != 200:
+        raise RuntimeError(f"API request failed with status {response.status_code}")
+    data = response.json()
+    return float(data[coin_id]["usd"])
 
 
 def get_prices_batch(coin_ids: list, api_key: str) -> dict:
@@ -54,7 +64,17 @@ def get_prices_batch(coin_ids: list, api_key: str) -> dict:
     # 2. Make ONE GET request with the joined string as "ids"
     # 3. Check status code
     # 4. Parse JSON and flatten into {coin_id: price} dict
-    pass
+    get_prices_url = f"{BASE_URL}/simple/price"
+    params = {
+        "ids": ",".join(coin_ids),
+        "vs_currencies": "usd",
+        "x_cg_demo_api_key": api_key,
+    }
+    response = requests.get(get_prices_url, params=params)
+    if response.status_code != 200:
+        raise RuntimeError(f"API request failed with status {response.status_code}")
+    data = response.json()
+    return {coin_id: float(data[coin_id]["usd"]) for coin_id in coin_ids}
 
 
 class CoinCache:
@@ -74,7 +94,10 @@ class CoinCache:
         """
         # TODO: Task 3
         # Set up: ttl_seconds, _store (empty dict), hits (0), misses (0)
-        pass
+        self.ttl_seconds = ttl_seconds
+        self._store = {}
+        self.hits = 0
+        self.misses = 0
 
     def put(self, coin_id: str, price: float):
         """
@@ -86,7 +109,7 @@ class CoinCache:
         """
         # TODO: Task 3
         # Store {"price": price, "timestamp": time.time()} in _store
-        pass
+        self._store[coin_id] = {"price": price, "timestamp": time.time()}
 
     def get(self, coin_id: str):
         """
@@ -100,7 +123,13 @@ class CoinCache:
         """
         # TODO: Task 3 — basic version (just check if key exists)
         # TODO: Task 4 — add TTL check (is the entry still fresh?)
-        pass
+        if coin_id in self._store:
+            entry = self._store[coin_id]
+            if time.time() - entry["timestamp"] < self.ttl_seconds:
+                self.hits += 1
+                return entry["price"]
+        self.misses += 1
+        return None
 
 
 def get_price_cached(coin_id: str, api_key: str, cache: CoinCache) -> float:
@@ -124,4 +153,10 @@ def get_price_cached(coin_id: str, api_key: str, cache: CoinCache) -> float:
     # 1. Try cache.get(coin_id)
     # 2. If not None, return it (cache hit!)
     # 3. If None, call get_price(), store with cache.put(), return price
-    pass
+    cached_price = cache.get(coin_id)
+    if cached_price is not None:
+        return cached_price
+
+    price = get_price(coin_id, api_key)
+    cache.put(coin_id, price)
+    return price
