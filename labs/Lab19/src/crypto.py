@@ -12,69 +12,54 @@ import requests
 BASE_URL = "https://api.coingecko.com/api/v3"
 
 
+
 def get_price(coin_id: str, api_key: str) -> float:
     """
     Fetch the current USD price of a single cryptocurrency.
-
-    Args:
-        coin_id: CoinGecko coin identifier (e.g., "bitcoin", "ethereum")
-        api_key: CoinGecko Demo API key
-
-    Returns:
-        The current price in USD as a float.
-
-    Raises:
-        RuntimeError: If the API response status code is not 200.
     """
-    # TODO: Task 1
-    # 1. Make a GET request to BASE_URL + "/simple/price"
-    #    with params: ids, vs_currencies, x_cg_demo_api_key
-    # 2. Check status code — raise RuntimeError if not 200
-    # 3. Parse JSON and return the USD price as a float
     get_price_url = f"{BASE_URL}/simple/price"
+
     params = {
         "ids": coin_id,
         "vs_currencies": "usd",
-        "x_cg_demo_api_key": api_key,
     }
-    response = requests.get(get_price_url, params=params)
+
+    headers = {
+        "x-cg-demo-api-key": api_key
+    }
+
+    response = requests.get(get_price_url, params=params, headers=headers)
+
     if response.status_code != 200:
         raise RuntimeError(f"API request failed with status {response.status_code}")
+
     data = response.json()
     return float(data[coin_id]["usd"])
-
-
-def get_prices_batch(coin_ids: list, api_key: str) -> dict:
+    
+def get_prices_batch(coin_ids: list[str], api_key: str) -> dict:
     """
     Fetch USD prices for multiple coins in a single API call.
-
-    Args:
-        coin_ids: List of CoinGecko coin identifiers
-        api_key: CoinGecko Demo API key
-
-    Returns:
-        Dictionary mapping coin_id to USD price.
-        Example: {"bitcoin": 65432.10, "ethereum": 3456.78}
-
-    Raises:
-        RuntimeError: If the API response status code is not 200.
     """
-    # TODO: Task 2
-    # 1. Join coin_ids into a comma-separated string
-    # 2. Make ONE GET request with the joined string as "ids"
-    # 3. Check status code
-    # 4. Parse JSON and flatten into {coin_id: price} dict
-    get_prices_url = f"{BASE_URL}/simple/price"
+    get_price_url = f"{BASE_URL}/simple/price"
+
     params = {
         "ids": ",".join(coin_ids),
         "vs_currencies": "usd",
-        "x_cg_demo_api_key": api_key,
     }
-    response = requests.get(get_prices_url, params=params)
+
+    headers = {
+        "x-cg-demo-api-key": api_key
+    }
+
+    response = requests.get(get_price_url, params=params, headers=headers)
+
     if response.status_code != 200:
         raise RuntimeError(f"API request failed with status {response.status_code}")
+
     data = response.json()
-    return {coin_id: float(data[coin_id]["usd"]) for coin_id in coin_ids}
+
+    # Flatten into {coin_id: price}
+    return {coin: float(data[coin]["usd"]) for coin in data}
 
 
 class CoinCache:
@@ -153,10 +138,4 @@ def get_price_cached(coin_id: str, api_key: str, cache: CoinCache) -> float:
     # 1. Try cache.get(coin_id)
     # 2. If not None, return it (cache hit!)
     # 3. If None, call get_price(), store with cache.put(), return price
-    cached_price = cache.get(coin_id)
-    if cached_price is not None:
-        return cached_price
-
-    price = get_price(coin_id, api_key)
-    cache.put(coin_id, price)
-    return price
+    pass
