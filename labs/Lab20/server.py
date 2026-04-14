@@ -21,13 +21,13 @@ app = FastAPI()
 # TODO: POST /grade endpoint
 
 from grading import grade
-@app.post("/grade")
-def grade_endpoint(request: dict):
-    student = request.get("student")
-    lab = request.get("lab")
-    slow = request.get("slow", False)
-    score = grade(student, lab, slow)
-    return {"score": score, "student": student, "lab": lab}
+##@app.post("/grade")
+##def grade_endpoint(request: dict):
+ ##   student = request.get("student")
+ ##   lab = request.get("lab")
+ ##   slow = request.get("slow", False)
+ ##   score = grade(student, lab, slow)
+ ##   return {"score": score, "student": student, "lab": lab}
 
 
 # ---------------------------------------------------------------------------
@@ -38,30 +38,41 @@ def grade_endpoint(request: dict):
 # to grade(), and (2) append each grading event to the log.
 # Add GET /log and POST /reset-log endpoints.
 
-# TODO: grading_log = []
-grading_log = []
+## TODO: grading_log = []
+## grading_log = []
 
 # TODO: update POST /grade to log events and support "slow"
-@app.post("/grade")
-def grade_endpoint(request: dict):
-    student = request.get("student")
-    lab = request.get("lab")
-    slow = request.get("slow", False)
-    score = grade(student, lab, slow)
-    grading_log.append({"student": student, "lab": lab, "score": score})
-    return {"score": score, "student": student, "lab": lab}
 
-# TODO: GET /log endpoint
-@app.get("/log")
-def get_log():
-    return {"log": grading_log}
+##@app.post("/grade")
+##def grade_endpoint(request: dict):
+ ##   student = request.get("student")
+ ##   lab = request.get("lab")
+ ##   slow = request.get("slow", False)
 
-# TODO: POST /reset-log endpoint
-@app.post("/reset-log")
-def reset_log():
-    global grading_log
-    grading_log = []
-    return {"message": "Log reset."}
+       ## score = grade(student, lab, slow)
+
+     ##grading_log.append({
+       ## "student": student,
+       ## "lab": lab,
+       ## "score": score,
+  ##  })
+   ## print("GRADE LOG ID:", id(grading_log), "LEN:", len(grading_log))
+   ## return {
+     ##   "student": student,
+    ##    "score": score,
+     ##   "lab": lab,
+    ##}
+
+##@app.get("/log")
+##def get_log():
+  ##  print("LOG   LOG ID:", id(grading_log), "LEN:", len(grading_log))
+  ## return {"entries": grading_log}
+
+##@app.post("/reset-log")
+##def reset_log():
+##    grading_log.clear()
+#    return {"message": "Log reset."}
+
 
 
 # ---------------------------------------------------------------------------
@@ -102,6 +113,7 @@ def grade_endpoint(request: dict):
         "student": student,
         "lab": lab,
         "score": score,
+
     }
 
 
