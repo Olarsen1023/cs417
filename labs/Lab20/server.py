@@ -88,36 +88,36 @@ from grading import grade
 grading_log = []
 completed = {}
 
-@app.post("/grade")
-def grade_endpoint(request: dict = Body(...)):
-    student = request.get("student")
-    lab = request.get("lab")
-    slow = request.get("slow", False)
-    submission_id = request.get("submission_id")
+##@app.post("/grade")
+##def grade_endpoint(request: dict = Body(...)):
+##    student = request.get("student")
+#    lab = request.get("lab")
+#    slow = request.get("slow", False)
+#    submission_id = request.get("submission_id")
 
-    if submission_id and submission_id in completed:
-        return {
-            "student": student,
-            "lab": lab,
-            "score": completed[submission_id],
-        }
+#    if submission_id and submission_id in completed:
+#        return {
+#            "student": student,
+#            "lab": lab,
+#            "score": completed[submission_id],
+#        }
 
-    score = grade(student, lab, slow)
+#   score = grade(student, lab, slow)
 
-    grading_log.append({
-        "student": student,
-        "lab": lab,
-        "score": score,
-    })
+#    grading_log.append({
+#        "student": student,
+#        "lab": lab,
+#        "score": score,
+#    })
 
-    if submission_id:
-        completed[submission_id] = score
+#    if submission_id:
+#        completed[submission_id] = score
 
-    return {
-        "student": student,
-        "lab": lab,
-        "score": score,
-    }
+#    return {
+#        "student": student,
+#        "lab": lab,
+#        "score": score,
+#    }
 
 @app.get("/log")
 def get_log():
@@ -144,38 +144,86 @@ def reset_completed():
 # Create a run_grade_job helper that does the actual grading.
 # Create GET /grade-jobs/{job_id} to check job status.
 
-# TODO: jobs = {}
-jobs = {}
-# TODO: job_submission_map = {}
-job_submission_map = {}
 
-# TODO: POST /grade-async endpoint
-from fastapi import BackgroundTasks, HTTPException
+from fastapi import BackgroundTasks, Body, HTTPException
 from fastapi.responses import JSONResponse
+
+jobs = {}
+job_submission_map = {}
+next_job_id = 1
+
+
+def run_grade_job(job_id: str, student: str, lab: int, slow: bool):
+    score = grade(student, lab, slow)
+
+    jobs[job_id] = {
+        "status": "complete",
+        "result": {
+            "student": student,
+            "lab": lab,
+            "score": score,
+        },
+    }
+
+    grading_log.append({
+        "student": student,
+        "lab": lab,
+        "score": score,
+    })
+
 @app.post("/grade-async")
-def grade_async(request: dict, background_tasks: BackgroundTasks):
+def grade_async(
+    request: dict = Body(...),
+    background_tasks: BackgroundTasks = None,
+):
+    global next_job_id
+
     student = request.get("student")
     lab = request.get("lab")
     slow = request.get("slow", False)
     submission_id = request.get("submission_id")
 
-    job_id = len(jobs) + 1
-    jobs[job_id] = {"status": "pending", "result": None}
-    job_submission_map[job_id] = submission_id
+  
+    if submission_id and submission_id in job_submission_map:
+        job_id = job_submission_map[submission_id]
+        return JSONResponse(
+            status_code=202,
+            content={"job_id": job_id, "status": "accepted"},
+        )
 
-    background_tasks.add_task(run_grade_job, job_id, student, lab, slow)
+    job_id = str(next_job_id)
+    next_job_id += 1
 
-    return JSONResponse(content={"job_id": job_id}, status_code=202)
+    jobs[job_id] = {"status": "pending"}
 
-# TODO: run_grade_job helper function
-def run_grade_job(job_id: int, student: str, lab: str, slow: bool):
-    score = grade(student, lab, slow)
-    jobs[job_id] = {"status": "completed", "result": score}
+    if submission_id:
+        job_submission_map[submission_id] = job_id
+
+    background_tasks.add_task(
+        run_grade_job, job_id, student, lab, slow
+    )
+
+    return JSONResponse(
+        status_code=202,
+        content={"job_id": job_id, "status": "accepted"},
+    )
 
 
-# TODO: GET /grade-jobs/{job_id} endpoint
 @app.get("/grade-jobs/{job_id}")
-def get_grade_job(job_id: int):
+def get_grade_job(job_id: str):
     if job_id not in jobs:
         raise HTTPException(status_code=404, detail="Job not found")
-    return {"job_id": job_id, "status": jobs[job_id]["status"], "result": jobs[job_id]["result"]}
+
+    job = jobs[job_id]
+
+    response = {
+        "job_id": job_id,
+        "status": job["status"],
+    }
+
+    if job["status"] == "complete":
+        response["result"] = job["result"]
+
+    return response
+
+
