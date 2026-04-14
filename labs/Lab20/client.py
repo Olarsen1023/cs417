@@ -67,7 +67,21 @@ def submit_idempotent(
     in the request body: f"{student}-lab{lab}"
     """
     # TODO: Implement
-    pass
+    submission_id = f"{student}-lab{lab}"
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                f"{base_url}/grade",
+                json={"student": student, "lab": lab, "slow": True, "submission_id": submission_id},
+                timeout=timeout,
+            )
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise RuntimeError(f"Request failed with status code {response.status_code}")
+        except requests.exceptions.Timeout:
+            print(f"Attempt {attempt + 1} timed out. Retrying...")
+    raise RuntimeError("all retries failed")
 
 
 def submit_async(

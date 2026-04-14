@@ -4,7 +4,7 @@ Your FastAPI grading server. Build each section as you work
 through the tasks. The TODOs tell you what to add and where.
 """
 
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
 from requests import request
 
 app = FastAPI()
@@ -84,13 +84,12 @@ from grading import grade
 # grading again or logging.
 # Add POST /reset-completed endpoint.
 
-# TODO: completed = {}
+
+grading_log = []
 completed = {}
 
-
-# TODO: update POST /grade to check submission_id
 @app.post("/grade")
-def grade_endpoint(request: dict):
+def grade_endpoint(request: dict = Body(...)):
     student = request.get("student")
     lab = request.get("lab")
     slow = request.get("slow", False)
@@ -101,10 +100,15 @@ def grade_endpoint(request: dict):
             "student": student,
             "lab": lab,
             "score": completed[submission_id],
-            }
+        }
 
     score = grade(student, lab, slow)
-    grading_log.append({"student": student, "lab": lab, "score": score})
+
+    grading_log.append({
+        "student": student,
+        "lab": lab,
+        "score": score,
+    })
 
     if submission_id:
         completed[submission_id] = score
@@ -113,9 +117,21 @@ def grade_endpoint(request: dict):
         "student": student,
         "lab": lab,
         "score": score,
-
     }
 
+@app.get("/log")
+def get_log():
+    return {"entries": grading_log}
+
+@app.post("/reset-log")
+def reset_log():
+    grading_log.clear()
+    return {"message": "Log reset."}
+
+@app.post("/reset-completed")
+def reset_completed():
+    completed.clear()
+    return {"message": "Completed submissions reset."}
 
 # ---------------------------------------------------------------------------
 # Task 4: Honest About Time
