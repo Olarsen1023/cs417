@@ -18,3 +18,26 @@ B: What I really dont love about B is line 19. it will not handle edge cases ver
 C: C is just slow. its readable and reliable, but very very slow in comparison to A. for instance, lines 21 to 25, to have to go through all of that data esspecally as it gets larger, this is jsut not the most effiecnt way to go about it.the for loop in combination with other for loop on 15 to 18 gives it a O(n^2) which can get pricey in terms of computaion time.
 
 A: I think it does the best all around job at handling the edge cases, as well as being time effiecnt! what I like the most about it is line 21 and 26. thats all it needs to have a pretty reliable execution of this function. I also like it is using the heap to reliably find the top of the lsit in case of ties.
+
+=== Regime 1 — small fixed vocabulary (50 distinct items) ===
+         n |   unique |     A (heap) |     B (sort) |     C (loop)
+------------------------------------------------------------------------
+       100 |       50 |       0.06ms |       0.03ms |       0.08ms
+     1,000 |       50 |       0.09ms |       0.06ms |       0.77ms
+    10,000 |       50 |       0.66ms |       0.45ms |       9.18ms
+   100,000 |       50 |      50.98ms |       4.99ms |      78.91ms
+
+=== Regime 2 — vocabulary scales with n (unique ≈ n/2) ===
+         n |   unique |     A (heap) |     B (sort) |     C (loop)
+------------------------------------------------------------------------
+       100 |       50 |       0.05ms |       0.02ms |       0.07ms
+     1,000 |      500 |       0.26ms |       0.20ms |       7.17ms
+    10,000 |    5,000 |       2.02ms |       3.28ms |     864.30ms
+    50,000 |   25,000 |      10.36ms |      14.27ms |   16084.25ms
+
+
+src/solution_c.py:29: error: Incompatible return value type (got "list[tuple[str, int]]", expected "list[int]")  [return-value]
+Found 1 error in 1 file (checked 3 source files)
+
+
+So B is probably better than C lol. so mypy caught that c was giving a tuple when it was soposed to get a normal int list out of solution C. the regimes did confrim that A was probably the best overall I mean even if you comapre the two differnt regimes. it seems like A is better for large scaling, wheras B is going to be better at the smaller stuff, but not by much. C is just garbage in comaprison.
