@@ -11,3 +11,10 @@ prediction one: I would say part B is going to break as the list gets bigger. pa
 
 prediction two: Honestly, C. I think it is going to have the most reliabilty out of the other two. it will defintly be slower but I think the condednsed, one list parsing, is going to be more reliable than the heap or lambda 
 
+Ranked from Worst to Best:
+
+B: What I really dont love about B is line 19. it will not handle edge cases very well in my opion as the way they get the largest is just chopping the top k, per line 18. it is easy to read and definetly effiecnt but I think falls short in the logic behined it.
+
+C: C is just slow. its readable and reliable, but very very slow in comparison to A. for instance, lines 21 to 25, to have to go through all of that data esspecally as it gets larger, this is jsut not the most effiecnt way to go about it.the for loop in combination with other for loop on 15 to 18 gives it a O(n^2) which can get pricey in terms of computaion time.
+
+A: I think it does the best all around job at handling the edge cases, as well as being time effiecnt! what I like the most about it is line 21 and 26. thats all it needs to have a pretty reliable execution of this function. I also like it is using the heap to reliably find the top of the lsit in case of ties.
