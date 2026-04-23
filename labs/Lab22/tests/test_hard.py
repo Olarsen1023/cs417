@@ -14,9 +14,9 @@ Run: pytest -v tests/test_hard.py
 
 import pytest
 
-from labs.Lab22.src.solution_a import top_k_frequent as top_k_a
-from labs.Lab22.src.solution_b import top_k_frequent as top_k_b
-from labs.Lab22.src.solution_c import top_k_frequent as top_k_c
+from src.solution_a import top_k_frequent as top_k_a
+from src.solution_b import top_k_frequent as top_k_b
+from src.solution_c import top_k_frequent as top_k_c
 
 
 SOLUTIONS = [
