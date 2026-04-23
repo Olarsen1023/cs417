@@ -48,3 +48,10 @@ my list would defintly change. if it is under 50 and runs once per week I would 
 Scenario B:
 I would change C to the worst option, but A is still the best for this case. as seen in regime 2, it speeds by both with a 10.36 ms time. B is close, with a 14, but as it continues to scale A is going to add to its lead. C is not in the converstaion.
 
+PR Comment
+Hello {user},
+    Just did a code review for your solution_C to the problem we were having. Sadly, I am going to have to reject this proposal off of the basis of time and computaion data. while nothing is inherently wrong with the code, and it's easy to read, the time it would take to proccses the amount of data we will be feeding would be to costly. on both lines 21-25 and line 15-18m I would look more twoards a sorting method or using the heap in this case as it would allow for a much better time complexity. thank you for your effort on this project and we will reach out when another opprotunity arises.
+
+    Sincerly,
+    Jay Microsoft
+
