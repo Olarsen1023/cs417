@@ -41,3 +41,10 @@ Found 1 error in 1 file (checked 3 source files)
 
 
 So B is probably better than C lol. so mypy caught that c was giving a tuple when it was soposed to get a normal int list out of solution C. the regimes did confrim that A was probably the best overall I mean even if you comapre the two differnt regimes. it seems like A is better for large scaling, wheras B is going to be better at the smaller stuff, but not by much. C is just garbage in comaprison.
+
+Scenario A:
+my list would defintly change. if it is under 50 and runs once per week I would choose B over A and C. B is going to be the fastest option for the smaller stuff. A would still handle it great, but jsut a little bit slower, and C is not even in the picture. as seens in regime 1.
+
+Scenario B:
+I would change C to the worst option, but A is still the best for this case. as seen in regime 2, it speeds by both with a 10.36 ms time. B is close, with a 14, but as it continues to scale A is going to add to its lead. C is not in the converstaion.
+
