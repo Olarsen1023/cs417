@@ -84,7 +84,26 @@ def build_report(rows: list[dict], categories: dict) -> dict:
 
     Pure: must NOT open files, read stdin, or print anything.
     """
-    raise NotImplementedError("Part 3: implement build_report")
+    totals = {}
+    for row in rows:
+        vendor = row["vendor"]
+        amount = float(row["amount"])
+        category = categorize(vendor, categories)
+        totals[category] = totals.get(category, 0.0) + amount
+    return totals
+
+   # **Done when:**
+##- `build_report(rows, categories)` returns a `dict[str, float]` of
+#category totals.
+#- `build_report` does NOT call `open`, read stdin, or print.
+ # (`tests/test_build_report_does_no_io` monkeypatches `open` to crash
+ # if it gets called from inside `build_report`.)
+# `tests/test_build_report_uses_passed_categories` passes — `build_report`
+ # uses the categories you pass in, not a globally-loaded dict.
+ #`main()` is now a thin shell: read the file(s), call `parse_csv`,
+ # call `build_report`, print the result.
+ #`python src/expense_report.py` still prints `TOTAL  $613.87`.
+
 
 
 # -----------------------------------------------------------------------------
@@ -94,28 +113,18 @@ def build_report(rows: list[dict], categories: dict) -> dict:
 # -----------------------------------------------------------------------------
 
 def main():
-    rows = []
-    with open("data/transactions.csv") as f:
-        for line in f.readlines()[1:]:
-            parts = line.strip().split(",")
-            if len(parts) != 4:
-                continue
-            rows.append(parts)
+    csv_text = Path("data/transactions.csv").read_text()
+    rows = parse_csv(csv_text)  # <-- now rows are dicts
 
     categories = json.loads(Path("data/categories.json").read_text())
 
-    totals = {}
-    for date, vendor, amount, _ in rows:
-        cat = "other"
-        for key, c in categories.items():
-            if key in vendor.upper():
-                cat = c
-        totals[cat] = totals.get(cat, 0.0) + float(amount)
+    totals = build_report(rows, categories)
 
     print("=== Expense Report ===")
     for cat, total in sorted(totals.items()):
-        print(f"  {cat:<15} ${total:>8.2f}")
-    print(f"  {'TOTAL':<15} ${sum(totals.values()):>8.2f}")
+        print(f"{cat:10} ${total:7.2f}")
+
+    print(f"\nTOTAL     ${sum(totals.values()):7.2f}")
 
 
 if __name__ == "__main__":
