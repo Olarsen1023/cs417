@@ -68,8 +68,12 @@ def categorize(vendor: str, categories: dict) -> str:
     A vendor matches a category if any of the keywords appears in the
     vendor name (case-insensitive). Return "other" if no category matches.
     """
-    raise NotImplementedError("Part 2: implement categorize")
-
+    vendor_upper = vendor.upper()
+    for category, keywords in categories.items():
+        for keyword in keywords:
+            if keyword.upper() in vendor_upper:
+                return category
+    return "other"
 
 # -----------------------------------------------------------------------------
 # TODO Part 3 — fill this in. (See README "Part 3 — A pure pipeline".)
@@ -98,19 +102,7 @@ def main():
                 continue
             rows.append(parts)
 
-    categories = {
-        "STARBUCKS": "food",
-        "DUNKIN": "food",
-        "WHOLEFOODS": "food",
-        "WHOLE FOODS": "food",
-        "SHELL": "gas",
-        "EXXON": "gas",
-        "AMAZON": "shopping",
-        "TARGET": "shopping",
-        "NETFLIX": "entertainment",
-        "SPOTIFY": "entertainment",
-        "HARDWARE": "home",
-    }
+    categories = json.loads(Path("data/categories.json").read_text())
 
     totals = {}
     for date, vendor, amount, _ in rows:
