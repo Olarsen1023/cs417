@@ -30,14 +30,31 @@ def parse_csv(text: str) -> list[dict]:
     """Return a list of row dicts: {"date", "vendor", "amount", "note"}.
     Skip lines that don't have 4 comma-separated fields.
     """
-    raise NotImplementedError("Part 1: implement parse_csv")
+    lines = text.strip().splitlines()
+    rows = []
+    for line in lines[1:]:  # skip header
+        parts = line.strip().split(",")
+        if len(parts) != 4:
+            continue
+        date, vendor, amount, note = parts
+        rows.append({"date": date, "vendor": vendor, "amount": amount, "note": note})
+    return rows
 
 
 def parse_json(text: str) -> list[dict]:
     """Return a list of row dicts: {"date", "vendor", "amount", "note"}.
     Input is JSON text — same fields as the CSV, just JSON-shaped.
     """
-    raise NotImplementedError("Part 1: implement parse_json")
+    data = json.loads(text)
+    rows = []
+    for item in data:
+        rows.append({
+            "date": item["date"],
+            "vendor": item["vendor"],
+            "amount": item["amount"],
+            "note": item["note"]
+        })
+    return rows
 
 
 # -----------------------------------------------------------------------------
